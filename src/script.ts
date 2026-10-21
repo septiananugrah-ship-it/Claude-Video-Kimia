@@ -18,6 +18,7 @@ export type Line = {
 export type SceneScript = {
   id: string;
   chapter: string; // nomor bab di heading, "" untuk tanpa heading
+  part?: 1 | 2 | 3; // bagian tugas: 1 teori dasar, 2 implementasi kimia, 3 industri
   title: string;
   lines: Line[];
   lead?: number;
@@ -54,8 +55,23 @@ export const SCRIPT: SceneScript[] = [
     lines: [],
   },
   {
+    id: 'roadmap',
+    chapter: '',
+    title: 'Peta video',
+    mood: 'wonder',
+    lead: 0.8,
+    tail: 1.4,
+    lines: [
+      {text: 'Video ini membahas kimia kuantum gerak vibrasi dalam tiga bagian.', hl: ['gerak vibrasi'], pause: 0.6},
+      {text: 'Pertama, prinsip dan teori dasarnya: dari model pegas hingga persamaan Schrödinger.', hl: ['prinsip dan teori dasarnya'], pause: 0.5},
+      {text: 'Kedua, implementasinya dalam bidang kimia: bagaimana getaran molekul dibaca melalui spektroskopi inframerah.', hl: ['implementasinya'], pause: 0.5},
+      {text: 'Dan ketiga, penerapannya dalam dunia industri.', hl: ['dunia industri'], pause: 0.6},
+    ],
+  },
+  {
     id: 'zoom',
     chapter: '01',
+    part: 1,
     title: 'Tidak ada yang benar-benar diam',
     mood: 'wonder',
     lead: 1.4,
@@ -73,6 +89,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'spring',
     chapter: '02',
+    part: 1,
     title: 'Ikatan kimia sebagai pegas',
     mood: 'build',
     lead: 1.2,
@@ -93,6 +110,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'frequency',
     chapter: '03',
+    part: 1,
     title: 'Kekakuan dan massa',
     mood: 'build',
     lead: 1.0,
@@ -109,12 +127,16 @@ export const SCRIPT: SceneScript[] = [
       {text: 'Hasilnya adalah satu rumus sederhana: frekuensi sebanding dengan akar dari k dibagi mu.', hl: ['akar dari k dibagi mu'], pause: 1.3},
       {text: 'Buktinya bisa kita lihat pada hidrogen klorida.', hl: ['hidrogen klorida'], pause: 0.4},
       {text: 'Jika hidrogen diganti deuterium, isotop yang dua kali lebih berat,', hl: ['deuterium'], pause: 0.3},
-      {text: 'jenis ikatannya tetap sama, tetapi getarannya melambat, kira-kira menjadi tujuh puluh persen frekuensi semula.', hl: ['melambat', 'tujuh puluh persen'], pause: 0.6},
+      {text: 'jenis ikatannya tetap sama, tetapi getarannya melambat, kira-kira menjadi tujuh puluh persen frekuensi semula.', hl: ['melambat', 'tujuh puluh persen'], pause: 1.0},
+      {text: 'Rumus yang sama juga bisa dibalik.', pause: 0.4},
+      {text: 'Dari pita hidrogen klorida di dua ribu delapan ratus delapan puluh enam sentimeter pangkat minus satu, kita dapat menghitung konstanta gaya ikatannya: kira-kira empat ratus delapan puluh newton per meter.', hl: ['konstanta gaya'], pause: 0.7},
+      {text: 'Inilah salah satu kekuatan spektroskopi vibrasi: ia mengukur seberapa kuat sebuah ikatan kimia.', hl: ['seberapa kuat'], pause: 0.6},
     ],
   },
   {
     id: 'landscape',
     chapter: '04',
+    part: 1,
     title: 'Lanskap energi',
     mood: 'wonder',
     lead: 1.0,
@@ -134,6 +156,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'ladder',
     chapter: '05',
+    part: 1,
     title: 'Lompatan kuantum',
     mood: 'quantum',
     lead: 1.0,
@@ -153,6 +176,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'wave',
     chapter: '06',
+    part: 1,
     title: 'Awan kemungkinan',
     mood: 'quantum',
     lead: 1.0,
@@ -172,6 +196,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'zpe',
     chapter: '07',
+    part: 1,
     title: 'Energi titik nol',
     mood: 'tension',
     lead: 1.0,
@@ -190,6 +215,7 @@ export const SCRIPT: SceneScript[] = [
   {
     id: 'light',
     chapter: '08',
+    part: 1,
     title: 'Bertemu cahaya inframerah',
     mood: 'bright',
     lead: 1.0,
@@ -209,8 +235,27 @@ export const SCRIPT: SceneScript[] = [
     ],
   },
   {
-    id: 'co2',
+    id: 'overtone',
     chapter: '09',
+    part: 1,
+    title: 'Pegas yang tidak sempurna',
+    mood: 'quantum',
+    lead: 1.0,
+    tail: 1.6,
+    lines: [
+      {text: 'Aturan delta v sama dengan plus atau minus satu berlaku sempurna hanya untuk osilator harmonik.', hl: ['osilator harmonik'], pause: 0.5},
+      {text: 'Karena molekul nyata mengikuti potensial Morse, anak tangga energinya makin rapat di tingkat yang lebih tinggi.', hl: ['makin rapat'], pause: 0.6},
+      {text: 'Akibatnya, lompatan dua atau tiga anak tangga sekaligus tetap bisa terjadi, meskipun sangat lemah.', hl: ['sangat lemah'], pause: 0.4},
+      {text: 'Pita lemah ini disebut overtone, dan muncul sedikit di bawah kelipatan frekuensi dasarnya.', hl: ['overtone'], pause: 0.8},
+      {text: 'Lalu, mengapa hampir semua serapan berangkat dari tingkat nol?', pause: 0.5},
+      {text: 'Menurut distribusi Boltzmann, pada suhu kamar hampir seluruh molekul berada di anak tangga paling bawah, karena jarak antartingkat vibrasi jauh lebih besar daripada energi termal.', hl: ['distribusi Boltzmann'], pause: 0.6},
+      {text: 'Itulah sebabnya pita fundamental, dari nol ke satu, adalah pita yang paling kuat dalam spektrum.', hl: ['pita fundamental'], pause: 0.6},
+    ],
+  },
+  {
+    id: 'co2',
+    chapter: '10',
+    part: 2,
     title: 'Banyak atom, banyak irama',
     mood: 'build',
     lead: 1.0,
@@ -230,7 +275,8 @@ export const SCRIPT: SceneScript[] = [
   },
   {
     id: 'ftir',
-    chapter: '10',
+    chapter: '11',
+    part: 2,
     title: 'Di dalam alat FTIR',
     mood: 'build',
     lead: 1.0,
@@ -249,7 +295,8 @@ export const SCRIPT: SceneScript[] = [
   },
   {
     id: 'spectrum',
-    chapter: '11',
+    chapter: '12',
+    part: 2,
     title: 'Membaca spektrum',
     mood: 'wonder',
     lead: 1.0,
@@ -265,7 +312,8 @@ export const SCRIPT: SceneScript[] = [
   },
   {
     id: 'pepet',
-    chapter: '12',
+    chapter: '13',
+    part: 2,
     title: 'PE lawan PET',
     mood: 'resolve',
     lead: 1.0,
@@ -284,7 +332,8 @@ export const SCRIPT: SceneScript[] = [
   },
   {
     id: 'industry',
-    chapter: '13',
+    chapter: '14',
+    part: 3,
     title: 'FTIR di laboratorium mutu',
     mood: 'bright',
     lead: 1.0,
@@ -301,8 +350,26 @@ export const SCRIPT: SceneScript[] = [
     ],
   },
   {
+    id: 'industry2',
+    chapter: '15',
+    part: 3,
+    title: 'Dari sensor gas hingga farmasi',
+    mood: 'bright',
+    lead: 1.0,
+    tail: 1.6,
+    lines: [
+      {text: 'Penerapan getaran molekul di industri tidak berhenti di laboratorium plastik.', pause: 0.5},
+      {text: 'Sensor gas inframerah, atau NDIR, memanfaatkan pita serapan karbon dioksida di sekitar dua ribu tiga ratus lima puluh sentimeter pangkat minus satu.', hl: ['NDIR'], pause: 0.4},
+      {text: 'Semakin banyak karbon dioksida di dalam ruang ukur, semakin sedikit cahaya yang sampai ke detektor.', hl: ['semakin sedikit cahaya'], pause: 0.5},
+      {text: 'Prinsip ini dipakai untuk memantau emisi cerobong pabrik, kualitas udara gedung, hingga proses fermentasi.', hl: ['memantau emisi'], pause: 0.8},
+      {text: 'Di industri farmasi, spektroskopi inframerah dipakai untuk memastikan identitas bahan baku obat dan membedakan bentuk kristal atau polimorf.', hl: ['polimorf'], pause: 0.8},
+      {text: 'Sementara di industri pangan dan pertanian, spektroskopi inframerah dekat membaca pita overtone untuk mengukur kadar air, protein, dan lemak secara cepat tanpa merusak sampel.', hl: ['inframerah dekat', 'tanpa merusak'], pause: 0.8},
+      {text: 'Satu prinsip kuantum yang sama, dipakai di berbagai sektor industri.', hl: ['berbagai sektor'], pause: 0.6},
+    ],
+  },
+  {
     id: 'recap',
-    chapter: '14',
+    chapter: '16',
     title: 'Merangkai semuanya',
     mood: 'resolve',
     lead: 1.0,

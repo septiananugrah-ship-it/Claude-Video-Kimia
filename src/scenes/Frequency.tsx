@@ -25,7 +25,8 @@ export const Frequency: React.FC = () => {
   const pB = win(t, cue(2) - 0.3, cue(5) - 0.5, 0.7, 0.6);
   const pC = win(t, cue(5) - 0.2, cue(7) - 0.5, 0.7, 0.6);
   const pD = win(t, cue(7) - 0.2, cue(9) - 0.5, 0.7, 0.6);
-  const pE = win(t, cue(9) - 0.2, 999, 0.7, 0.6);
+  const pE = win(t, cue(9) - 0.2, cue(12) - 0.3, 0.7, 0.6);
+  const pF = ramp(t, cue(12) - 0.1, cue(12) + 0.7);
 
   // --- Fase A: pertanyaan ---
   const qx = 30 * Math.sin(2 * Math.PI * 0.8 * t);
@@ -206,6 +207,58 @@ export const Frequency: React.FC = () => {
               <V color={C.cyan}>μ</V>
             </div>
           </div>
+        </div>
+      </Card>
+
+      {/* Fase F: menghitung konstanta gaya dari spektrum */}
+      <Card x={960} y={270} opacity={pF} scale={0.9 + 0.1 * pF} accent={C.gold} style={{padding: '18px 40px'}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 28, fontSize: 46}}>
+          <span style={{opacity: 1 - 0.5 * ramp(t, cue(12) + 1, cue(12) + 1.6)}}>
+            <V color={C.gold}>ν</V> = <span style={{fontSize: 34}}>1/2π</span> √(<V color={C.gold}>k</V>/<V color={C.cyan}>μ</V>)
+          </span>
+          <span style={{color: C.gold, opacity: ramp(t, cue(12) + 0.8, cue(12) + 1.3)}}>⟶</span>
+          <span style={{opacity: ramp(t, cue(12) + 1, cue(12) + 1.6)}}>
+            <V color={C.gold}>k</V> = <V color={C.cyan}>μ</V> (2π<V>c</V>
+            <V>ν̃</V>)²
+          </span>
+        </div>
+      </Card>
+      <div
+        style={{
+          position: 'absolute',
+          left: 960,
+          top: 560,
+          transform: 'translate(-50%, -50%)',
+          opacity: ramp(t, cue(13) - 0.2, cue(13) + 0.5),
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+          fontFamily: FONT.mono,
+          fontSize: 34,
+          color: C.ink,
+          padding: '26px 44px',
+          borderRadius: 22,
+          background: 'rgba(10,15,34,0.85)',
+          border: `1px solid ${C.faint}`,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {[
+          [wordOf(13, 'delapan'), <>ν̃ = <span style={{color: C.mint}}>2886 cm⁻¹</span>  →  ν = c·ν̃ = 8,65 × 10¹³ Hz</>],
+          [wordOf(13, 'menghitung'), <>μ(H–Cl) = (1,008 × 34,97)/(1,008 + 34,97) u = 1,63 × 10⁻²⁷ kg</>],
+          [wordOf(13, 'kira-kira'), <>k = μ(2πν)² ≈ <span style={{color: C.gold, fontWeight: 600, fontSize: 44, textShadow: `0 0 ${18 * ramp(t, cue(14), cue(14) + 0.6)}px ${C.gold}`}}>480 N/m</span></>],
+        ].map(([at, row], i) => {
+          const p = ramp(t, (at as number) - 0.2, (at as number) + 0.5);
+          return (
+            <div key={i} style={{opacity: p, translate: `${(1 - p) * -20}px 0px`}}>
+              {row as React.ReactNode}
+            </div>
+          );
+        })}
+      </div>
+      <Card x={960} y={790} opacity={ramp(t, cue(14), cue(14) + 0.6)} accent={C.gold} style={{padding: '12px 30px'}}>
+        <div style={{fontSize: 30}}>
+          spektrum <span style={{color: C.muted}}>→</span> <span style={{color: C.gold, fontWeight: 600}}>kekuatan ikatan kimia</span>
         </div>
       </Card>
 
