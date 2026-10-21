@@ -1,31 +1,24 @@
 # Sidik Jari Molekul — versi Claude
 
 Film edukasi **kimia kuantum** tentang getaran molekul dan spektroskopi FTIR, dibuat ulang dari nol dengan [Remotion](https://remotion.dev).
-1920 × 1080 · 30 FPS · **±13 menit** · 14 bab + pembuka, judul, dan penutup.
+1920 × 1080 / 2560 × 1440 · 30 FPS · **±16 menit** · 16 bab + pembuka, judul, peta video, dan penutup.
 
 > Gaya visual terinspirasi video referensi "sarang lebah": panggung gelap, objek yang bertransformasi dengan mulus, kisi heksagonal halus, dan subtitle kata-per-kata dengan kata kunci yang disorot emas.
 
 ## Alur cerita
 
-| Waktu | Bab | Isi |
+Topik tugas: **Kimia Kuantum Gerak Vibrasi** — mencakup tiga bagian wajib (prinsip & teori dasar · implementasi dalam kimia · penerapan di industri). Daftar bab bertimecode untuk deskripsi YouTube/LMS ada di `naskah/BAB_YOUTUBE.txt`.
+
+| Waktu | Bagian | Bab |
 |---|---|---|
-| 00:00 | Pembuka | Dua lembar plastik kembar (PE dan PET): bagaimana membedakannya? |
-| 00:36 | Judul | *Sidik Jari Molekul* |
-| 00:43 | 01 · Tidak ada yang benar-benar diam | Perbesaran plastik → rantai polimer → atom yang bergetar |
-| 01:18 | 02 · Ikatan kimia sebagai pegas | Panjang ikatan setimbang, gaya pemulih, hukum Hooke, awan elektron |
-| 02:10 | 03 · Kekakuan dan massa | C–C / C=C / C≡C, massa tereduksi, ν = (1/2π)√(k/μ), H–Cl vs D–Cl |
-| 03:18 | 04 · Lanskap energi | Parabola harmonik → potensial Morse, disosiasi |
-| 04:07 | 05 · Lompatan kuantum | Klasik vs kuantum, persamaan Schrödinger, Eᵥ = (v + ½)hν |
-| 04:59 | 06 · Awan kemungkinan | Fungsi gelombang ψ, \|ψ\|², simpul, awan probabilitas |
-| 05:40 | 07 · Energi titik nol | E₀ = ½hν, 0 K, prinsip ketidakpastian Heisenberg |
-| 06:20 | 08 · Bertemu cahaya inframerah | Spektrum EM, foton cocok vs tidak cocok, Δv = ±1, syarat dipol (HCl vs N₂/O₂) |
-| 07:23 | 09 · Banyak atom, banyak irama | Mode normal 3N−5/3N−6, empat mode CO₂, efek rumah kaca |
-| 08:34 | 10 · Di dalam alat FTIR | Interferometer Michelson, interferogram, transformasi Fourier |
-| 09:30 | 11 · Membaca spektrum | Bilangan gelombang, wilayah X–H, karbonil, wilayah sidik jari |
-| 10:13 | 12 · PE lawan PET | Struktur dan spektrum: pita C=O 1715 cm⁻¹ hanya pada PET |
-| 11:11 | 13 · FTIR di laboratorium mutu | Identitas bahan baku, kontaminan, oksidasi, ATR, kehati-hatian, pustaka rujukan |
-| 11:58 | 14 · Merangkai semuanya | Rangkuman lima langkah, botol plastik yang "bernyanyi" |
-| 12:51 | Penutup | Rujukan |
+| 00:00 | — | Pembuka: dua plastik kembar · Judul · Peta video |
+| 01:08 | 1 · Teori dasar | 01 Tidak ada yang benar-benar diam · 02 Ikatan kimia sebagai pegas · 03 Kekakuan dan massa (+ contoh hitungan k H–Cl ≈ 480 N/m) |
+| 04:10 | 1 · Teori dasar | 04 Lanskap energi · 05 Lompatan kuantum · 06 Awan kemungkinan · 07 Energi titik nol · 08 Bertemu cahaya inframerah · 09 Pegas yang tidak sempurna (overtone, Boltzmann) |
+| 09:20 | 2 · Implementasi kimia | 10 Banyak atom, banyak irama (CO₂) · 11 Di dalam alat FTIR · 12 Membaca spektrum · 13 PE lawan PET |
+| 13:09 | 3 · Industri | 14 FTIR di laboratorium mutu · 15 Dari sensor gas hingga farmasi (NDIR, polimorf, NIR) |
+| 14:59 | — | 16 Merangkai semuanya · Penutup & rujukan |
+
+Narasi: suara ElevenLabs (Bagas, `eleven_v4`), ±16 menit. Thumbnail 2560×1440: `preview/thumbnail.png` (komposisi `Thumbnail`).
 
 ## Naskah & voice-over
 

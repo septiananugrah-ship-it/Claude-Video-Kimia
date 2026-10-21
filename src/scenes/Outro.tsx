@@ -11,6 +11,7 @@ const REFS = [
   'NIST CCCBDB — frekuensi vibrasi eksperimen',
   'P. Atkins & J. de Paula, Physical Chemistry',
   'D. Pavia dkk., Introduction to Spectroscopy',
+  'D. Skoog dkk., Principles of Instrumental Analysis (NDIR, NIR, ATR)',
 ];
 
 export const Outro: React.FC = () => {
