@@ -1,7 +1,7 @@
 import {Audio} from '@remotion/media';
 import React from 'react';
 import {AbsoluteFill, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {EASE_IN_OUT, ramp} from './anim';
+import {EASE, EASE_IN_OUT, ramp} from './anim';
 import {Background, Vignette} from './components/Background';
 import {Captions} from './components/Captions';
 import {ChapterHeading} from './components/ChapterHeading';
@@ -16,8 +16,10 @@ export {defaultVideoProps, type VideoProps};
 /** Bingkai kamera: dorongan pelan + transisi masuk/keluar sinematik. */
 const SceneShell: React.FC<{children: React.ReactNode}> = ({children}) => {
   const {t, dur} = useScene();
-  const enter = ramp(t, -PRE, 0.35, EASE_IN_OUT);
-  const exit = ramp(t, dur - 0.35, dur + POST, EASE_IN_OUT);
+  // Transisi "zoom-through": bab lama maju & memudar habis tepat sebelum batas,
+  // bab baru muncul dari kedalaman sesudahnya — tidak ada dua bab yang bertumpuk.
+  const enter = ramp(t, 0, 0.65, EASE);
+  const exit = ramp(t, dur - 0.55, dur + 0.05, EASE_IN_OUT);
   const push = 1 + 0.03 * (t / Math.max(dur, 1));
   const scale = push * (0.94 + 0.06 * enter) * (1 + 0.07 * exit);
   const blur = 14 * (1 - enter) + 18 * exit;
@@ -52,6 +54,37 @@ const SceneSlot: React.FC<{scene: TScene}> = ({scene}) => {
   );
 };
 
+/** Kilatan cahaya tipis di setiap pergantian bab (selaras dengan whoosh di musik). */
+const TransitionFlash: React.FC = () => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const t = frame / fps;
+  const b = TIMELINE.scenes.slice(1).find((s) => Math.abs(t - s.start) < 0.45);
+  if (!b) return null;
+  const p = (t - (b.start - 0.45)) / 0.9;
+  const k = Math.sin(Math.PI * Math.min(1, Math.max(0, p)));
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none', mixBlendMode: 'screen'}}>
+      <AbsoluteFill style={{background: `radial-gradient(ellipse 45% 30% at 50% 47%, rgba(255,214,140,${0.22 * k}), transparent 70%)`}} />
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '47%',
+          width: 1700,
+          height: 3,
+          marginLeft: -850,
+          scale: `${0.15 + 0.95 * p} 1`,
+          opacity: k,
+          background: 'linear-gradient(90deg, transparent, rgba(255,194,74,0.9) 30%, #fff 50%, rgba(79,214,255,0.9) 70%, transparent)',
+          boxShadow: '0 0 24px rgba(255,214,140,0.8)',
+          borderRadius: 2,
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
 const MusicFade: React.FC<{volume: number}> = ({volume}) => {
   const {durationInFrames} = useVideoConfig();
   useCurrentFrame();
@@ -70,6 +103,7 @@ export const SidikJariMolekul: React.FC<VideoProps> = ({showCaptions, musicVolum
       {TIMELINE.scenes.map((s) => (
         <SceneSlot key={s.id} scene={s} />
       ))}
+      <TransitionFlash />
       <ChapterHeading />
       {showCaptions ? <Captions /> : null}
       <Vignette />
