@@ -3,4 +3,3 @@ out
 build
 .DS_Store
 *.log
-public/voiceover/*.mp3

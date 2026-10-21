@@ -15,8 +15,8 @@ import {lineKey} from '../src/timeline.ts';
 const measureOnly = process.argv.includes('--measure');
 const apiKey = process.env.ELEVENLABS_API_KEY;
 // Suara multibahasa; ganti dengan voice ID pilihan Anda dari pustaka ElevenLabs.
-const voiceId = process.env.ELEVENLABS_VOICE_ID ?? 'JBFqnCBsd6RMkjVDRZzb';
-const modelId = process.env.ELEVENLABS_MODEL ?? 'eleven_multilingual_v2';
+const voiceId = process.env.ELEVENLABS_VOICE_ID || 'JBFqnCBsd6RMkjVDRZzb';
+const modelId = process.env.ELEVENLABS_MODEL || 'eleven_v4';
 
 mkdirSync('public/voiceover', {recursive: true});
 
@@ -39,13 +39,23 @@ for (const scene of SCRIPT) {
         body: JSON.stringify({
           text: line.text,
           model_id: modelId,
-          language_code: 'id',
+          // language_code tidak didukung model multilingual_v2
+          ...(modelId.includes('multilingual_v2') ? {} : {language_code: 'id'}),
           previous_text: prev,
           next_text: next,
-          voice_settings: {stability: 0.55, similarity_boost: 0.75, style: 0.25, speed: 0.95},
+          voice_settings: {stability: 0.55, similarity_boost: 0.75, style: 0, speed: 0.95},
         }),
       });
-      if (!res.ok) throw new Error(`${key}: ${res.status} ${await res.text()}`);
+      if (!res.ok) {
+        const body = await res.text();
+        const hint =
+          res.status === 401
+            ? 'API key salah atau belum disimpan.'
+            : res.status === 402 || /quota|credit/i.test(body)
+              ? 'Kredit ElevenLabs habis atau suara ini butuh paket berbayar.'
+              : '';
+        throw new Error(`${key}: ${res.status} ${body} ${hint}`);
+      }
       writeFileSync(file, Buffer.from(await res.arrayBuffer()));
       console.log(`✓ ${key}`);
     }

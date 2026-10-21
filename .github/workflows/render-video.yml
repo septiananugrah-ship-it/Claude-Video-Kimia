@@ -1,5 +1,16 @@
 name: Render Sidik Jari Molekul 2K 30FPS
 on:
+  workflow_call:
+    inputs:
+      resolusi:
+        type: string
+        default: '2k'
+      props:
+        type: string
+        default: '{}'
+      ref:
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       resolusi:
@@ -25,6 +36,8 @@ jobs:
         chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -37,8 +50,8 @@ jobs:
         run: node --experimental-strip-types scripts/render-chunk.ts
         env:
           CHUNK: ${{ matrix.chunk }}
-          COMPOSITION: ${{ github.event.inputs.resolusi == '1080p' && 'SidikJariMolekul' || 'SidikJariMolekul2K' }}
-          PROPS: ${{ github.event.inputs.props || '{}' }}
+          COMPOSITION: ${{ inputs.resolusi == '1080p' && 'SidikJariMolekul' || 'SidikJariMolekul2K' }}
+          PROPS: ${{ inputs.props || '{}' }}
           RENDER_CONCURRENCY: 4
       - uses: actions/upload-artifact@v4
         with:
@@ -53,6 +66,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -68,11 +83,11 @@ jobs:
       - name: Gabungkan video + audio
         run: ./scripts/assemble.sh
         env:
-          PROPS: ${{ github.event.inputs.props || '{}' }}
-          OUT: out/sidik-jari-molekul-${{ github.event.inputs.resolusi || '2k' }}-30fps.mp4
+          PROPS: ${{ inputs.props || '{}' }}
+          OUT: out/sidik-jari-molekul-${{ inputs.resolusi || '2k' }}-30fps.mp4
       - uses: actions/upload-artifact@v4
         with:
-          name: sidik-jari-molekul-${{ github.event.inputs.resolusi || '2k' }}-30fps
+          name: sidik-jari-molekul-${{ inputs.resolusi || '2k' }}-30fps
           path: out/sidik-jari-molekul-*.mp4
           retention-days: 14
           compression-level: 0
