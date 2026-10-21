@@ -63,6 +63,21 @@ writeFileSync(
     .join('\n\n'),
 );
 
+// ---------- Daftar bab untuk deskripsi YouTube / LMS ----------
+const PART_NAMES: Record<number, string> = {1: 'Prinsip & teori dasar', 2: 'Implementasi dalam kimia', 3: 'Penerapan di industri'};
+const chapters: string[] = ['Kimia Kuantum Gerak Vibrasi — Sidik Jari Molekul', ''];
+let lastPart = 0;
+for (const s of TIMELINE.scenes) {
+  if (s.id === 'title' || s.id === 'outro') continue;
+  if (s.part && s.part !== lastPart) {
+    chapters.push('', `BAGIAN ${s.part} · ${PART_NAMES[s.part]}`);
+    lastPart = s.part;
+  }
+  if (!s.part && lastPart && s.chapter) chapters.push('');
+  chapters.push(`${formatTime(s.start)} ${s.chapter ? `Bab ${s.chapter} · ` : ''}${s.id === 'hook' ? 'Pembuka: dua plastik kembar' : s.title}`);
+}
+writeFileSync('naskah/BAB_YOUTUBE.txt', chapters.join('\n') + '\n');
+
 // ---------- SRT ----------
 let n = 1;
 const srt: string[] = [];
