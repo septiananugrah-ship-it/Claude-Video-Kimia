@@ -75,7 +75,14 @@ npm run render:preview   # pratinjau cepat 960×540
 ```
 
 Props komposisi: `showCaptions` (subtitle on/off), `musicVolume` (0–1), `voiceover` (putar file di `public/voiceover/`).
-Render juga bisa dijalankan di GitHub Actions: tab **Actions → Render video → Run workflow**, lalu unduh artefaknya.
+### Render 2K di GitHub Actions (untuk diunduh)
+
+1. Buka tab **Actions** → **Render Sidik Jari Molekul 2K 30FPS** → **Run workflow**.
+2. Pilih branch, resolusi **2k** (2560×1440, 30 FPS) atau 1080p, lalu jalankan.
+3. Film dipotong menjadi 12 bagian yang dirender paralel (masing-masing diverifikasi jumlah framenya), lalu job *assemble* menggabungkannya tanpa re-encode dan menambahkan audio.
+4. Setelah selesai (±30–45 menit), unduh artefak **sidik-jari-molekul-2k-30fps** di halaman run tersebut (ZIP berisi MP4 H.264 + AAC, ±450 MB).
+
+Versi 2K adalah komposisi `SidikJariMolekul2K`: seluruh desain 1920×1080 diperbesar 4/3 sebagai vektor, sehingga teks, garis, dan atom tetap tajam (bukan upscale gambar). Lokal: `node --experimental-strip-types scripts/render-chunk.ts` (dengan `CHUNK`/`CHUNKS`) lalu `./scripts/assemble.sh`.
 
 Di lingkungan Linux tanpa Chrome lengkap, arahkan Remotion ke *headless shell*: `CHROME_PATH=/path/ke/headless_shell npm run render`.
 

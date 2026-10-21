@@ -1,6 +1,6 @@
 import React from 'react';
 import {Composition, Folder} from 'remotion';
-import {SidikJariMolekul, SingleScene, defaultVideoProps} from './Composition';
+import {SidikJariMolekul, SidikJariMolekul2K, SingleScene, defaultVideoProps} from './Composition';
 import {FPS, TIMELINE, TOTAL_FRAMES} from './timeline.ts';
 import './theme';
 
@@ -11,6 +11,15 @@ export const RemotionRoot: React.FC = () => (
       component={SidikJariMolekul}
       width={1920}
       height={1080}
+      fps={FPS}
+      durationInFrames={TOTAL_FRAMES}
+      defaultProps={defaultVideoProps}
+    />
+    <Composition
+      id="SidikJariMolekul2K"
+      component={SidikJariMolekul2K}
+      width={2560}
+      height={1440}
       fps={FPS}
       durationInFrames={TOTAL_FRAMES}
       defaultProps={defaultVideoProps}
