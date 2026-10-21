@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig} from 'remotion';
+import {AbsoluteFill, interpolate, interpolateColors, useCurrentFrame, useVideoConfig} from 'remotion';
 import {EASE, ramp} from '../anim';
 import {C, FONT} from '../theme';
 import {ALL_LINES, type TWord} from '../timeline.ts';
@@ -62,7 +62,8 @@ export const Captions: React.FC = () => {
       >
         {page.words.map((w, i) => {
           const spoken = ramp(t, w.start - 0.04, w.start + 0.14);
-          const active = t >= w.start - 0.04 && t < w.end + 0.08;
+          // kata yang sedang diucapkan sedikit membesar, naik-turun halus (tanpa lompatan)
+          const active = Math.min(ramp(t, w.start - 0.08, w.start + 0.06), 1 - ramp(t, w.end, w.end + 0.18));
           const appear = interpolate(t, [page.start + i * 0.025, page.start + i * 0.025 + 0.3], [0, 1], {
             extrapolateLeft: 'clamp',
             extrapolateRight: 'clamp',
@@ -77,8 +78,8 @@ export const Captions: React.FC = () => {
                 marginRight: '0.28em',
                 opacity: appear * base,
                 translate: `0px ${(1 - appear) * 10}px`,
-                scale: active ? '1.045' : '1',
-                color: w.hl && spoken > 0 ? C.gold : C.ink,
+                scale: String(1 + 0.05 * active),
+                color: w.hl ? interpolateColors(spoken, [0, 1], [C.ink, C.gold]) : C.ink,
                 fontWeight: w.hl ? 700 : 500,
                 textShadow: w.hl && spoken > 0 ? `0 0 ${18 * spoken}px rgba(255,194,74,0.55), 0 2px 18px rgba(0,0,0,0.85)` : undefined,
                 position: 'relative',

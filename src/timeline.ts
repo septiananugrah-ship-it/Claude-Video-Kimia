@@ -2,11 +2,12 @@
 // File ini tidak bergantung pada Remotion, sehingga bisa dipakai juga oleh
 // scripts/export-timeline.ts (naskah teleprompter, SRT, dan peta musik).
 import {SCRIPT, type SceneScript} from './script.ts';
-import {VOICEOVER_DURATIONS} from './voiceover.ts';
+import {VOICEOVER_DURATIONS, VOICEOVER_SILENCES} from './voiceover.ts';
 
 // Durasi rekaman per baris (detik), diisi otomatis oleh scripts/generate-voiceover.ts.
 // Jika ada, durasi rekaman menggantikan estimasi suku kata.
 const MEASURED = VOICEOVER_DURATIONS;
+const SILENCES: Record<string, [number, number][]> = VOICEOVER_SILENCES;
 export const lineKey = (sceneId: string, index: number) => `${sceneId}-${String(index).padStart(2, '0')}`;
 
 export const FPS = 30;
@@ -103,6 +104,62 @@ export const lineDuration = (text: string) => {
   );
 };
 
+/**
+ * Menempatkan kata-kata di dalam rekaman sungguhan: jeda hening yang terdeteksi dipakai
+ * sebagai batas frasa (setelah koma/titik dua/titik), dan kata di dalam frasa dibagi
+ * menurut jumlah suku kata. Hasil: posisi relatif {start, end} per kata (detik).
+ */
+const alignWords = (tokens: string[], dur: number, sil: [number, number][]) => {
+  let v0 = 0;
+  let v1 = dur;
+  for (const [a, b] of sil) {
+    if (a <= 0.03) v0 = Math.max(v0, b);
+    if (b >= dur - 0.03) v1 = Math.min(v1, a);
+  }
+  if (v1 - v0 < 0.3) {
+    v0 = 0;
+    v1 = dur;
+  }
+  // kelompokkan kata menjadi frasa berdasarkan tanda baca
+  const phrases: number[][] = [[]];
+  tokens.forEach((w, i) => {
+    phrases[phrases.length - 1].push(i);
+    if (/[,;:.!?]$/.test(w) && i < tokens.length - 1) phrases.push([]);
+  });
+  const need = phrases.length - 1;
+  const inner = sil
+    .filter(([a, b]) => a > v0 + 0.05 && b < v1 - 0.05)
+    .sort((x, y) => y[1] - y[0] - (x[1] - x[0]))
+    .slice(0, need)
+    .sort((x, y) => x[0] - y[0]);
+  const segs: [number, number][] = [];
+  if (need > 0 && inner.length === need) {
+    let a = v0;
+    for (const [s0, s1] of inner) {
+      segs.push([a, s0]);
+      a = s1;
+    }
+    segs.push([a, v1]);
+  }
+  const groups = segs.length ? phrases : [tokens.map((_, i) => i)];
+  const ranges = segs.length ? segs : [[v0, v1] as [number, number]];
+  const out: {start: number; end: number}[] = new Array(tokens.length);
+  groups.forEach((g, gi) => {
+    const [a, b] = ranges[gi];
+    const w = g.map((i) => Math.max(0.85, syllables(tokens[i])));
+    // tanpa jeda nyata: sisipkan perkiraan jeda tanda baca di dalam frasa
+    const gap = g.map((i, k) => (segs.length || k === g.length - 1 ? 0 : punctuationPause(tokens[i], false) * SYLLABLES_PER_SECOND));
+    const units = w.reduce((x, y) => x + y, 0) + gap.reduce((x, y) => x + y, 0);
+    const per = (b - a) / units;
+    let c = a;
+    g.forEach((i, k) => {
+      out[i] = {start: c, end: c + w[k] * per};
+      c += (w[k] + gap[k]) * per;
+    });
+  });
+  return out;
+};
+
 const buildTimeline = () => {
   let cursor = 0;
   const scenes: TScene[] = [];
@@ -118,14 +175,22 @@ const buildTimeline = () => {
         const tokens = line.text.split(/\s+/).filter(Boolean);
         const flags = markHighlights(tokens, line.hl);
         const lineStart = cursor;
-        const measured = MEASURED[lineKey(s.id, li)];
-        const scale = measured ? measured / lineDuration(line.text) : 1;
-        const words: TWord[] = tokens.map((w, i) => {
-          const d = Math.max(0.16, syllables(w) / SYLLABLES_PER_SECOND) * scale;
-          const word = {text: w, start: cursor, end: cursor + d, hl: flags[i]};
-          cursor += d + punctuationPause(w, i === tokens.length - 1) * scale;
-          return word;
-        });
+        const key = lineKey(s.id, li);
+        const measured = MEASURED[key];
+        let words: TWord[];
+        if (measured) {
+          // rekaman ada: kata diselaraskan dengan jeda nyata di dalam rekaman
+          const pos = alignWords(tokens, measured, SILENCES[key] ?? []);
+          words = tokens.map((w, i) => ({text: w, start: lineStart + pos[i].start, end: lineStart + pos[i].end, hl: flags[i]}));
+          cursor = lineStart + measured;
+        } else {
+          words = tokens.map((w, i) => {
+            const d = Math.max(0.16, syllables(w) / SYLLABLES_PER_SECOND);
+            const word = {text: w, start: cursor, end: cursor + d, hl: flags[i]};
+            cursor += d + punctuationPause(w, i === tokens.length - 1);
+            return word;
+          });
+        }
         const lineEnd = cursor;
         cursor += line.pause ?? DEFAULT_PAUSE;
         lineTimes.push({start: lineStart - start, end: lineEnd - start});
