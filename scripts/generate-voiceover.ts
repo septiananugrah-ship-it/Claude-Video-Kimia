@@ -7,7 +7,7 @@
 // Durasi hasil ukur ditulis ke src/voiceover.ts sehingga timeline, subtitle, dan animasi
 // menyesuaikan dengan suara sebenarnya. Setelah itu jalankan `npm run timeline && npm run music`
 // lalu render dengan props {"voiceover": true}.
-import {execFileSync} from 'node:child_process';
+import {execFileSync, spawnSync} from 'node:child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
 import {SCRIPT} from '../src/script.ts';
 import {lineKey} from '../src/timeline.ts';
@@ -26,6 +26,25 @@ if (!measureOnly && !apiKey) {
 }
 
 const durations: Record<string, number> = {};
+const silences: Record<string, [number, number][]> = {};
+
+/** Jeda hening di dalam rekaman (detik) — dipakai untuk menyelaraskan kata subtitle dengan suara. */
+const detectSilences = (file: string, dur: number): [number, number][] => {
+  // silencedetect menulis hasilnya ke stderr
+  const log = spawnSync('ffmpeg', ['-hide_banner', '-i', file, '-af', 'silencedetect=noise=-38dB:d=0.12', '-f', 'null', '-'], {encoding: 'utf8'}).stderr;
+  const res: [number, number][] = [];
+  let open: number | null = null;
+  for (const m of log.matchAll(/silence_(start|end): ([\d.]+)/g)) {
+    const v = Number(m[2]);
+    if (m[1] === 'start') open = v;
+    else if (open !== null) {
+      res.push([Math.round(open * 1000) / 1000, Math.round(Math.min(v, dur) * 1000) / 1000]);
+      open = null;
+    }
+  }
+  if (open !== null) res.push([Math.round(open * 1000) / 1000, dur]);
+  return res;
+};
 for (const scene of SCRIPT) {
   for (const [i, line] of scene.lines.entries()) {
     const key = lineKey(scene.id, i);
@@ -61,14 +80,16 @@ for (const scene of SCRIPT) {
     }
     if (existsSync(file)) {
       const out = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file]).toString();
-      durations[key] = Math.round(Number(out) * 1000) / 1000;
+      const dur = Math.round(Number(out) * 1000) / 1000;
+      durations[key] = dur;
+      silences[key] = detectSilences(file, dur);
     }
   }
 }
 
 writeFileSync(
   'src/voiceover.ts',
-  `// File ini ditulis ulang otomatis oleh scripts/generate-voiceover.ts.\n// Berisi durasi rekaman per baris narasi (detik). Kosong = memakai estimasi suku kata.\nexport const VOICEOVER_DURATIONS: Record<string, number> = ${JSON.stringify(durations, null, 2)};\n`,
+  `// File ini ditulis ulang otomatis oleh scripts/generate-voiceover.ts.\n// Berisi durasi rekaman per baris narasi (detik). Kosong = memakai estimasi suku kata.\nexport const VOICEOVER_DURATIONS: Record<string, number> = ${JSON.stringify(durations, null, 2)};\n\n// Jeda hening di dalam setiap rekaman [mulai, selesai] (detik), untuk sinkron kata subtitle.\nexport const VOICEOVER_SILENCES: Record<string, [number, number][]> = ${JSON.stringify(silences)};\n`,
 );
 console.log(`${Object.keys(durations).length} baris diukur → src/voiceover.ts`);
 console.log('Lanjutkan: npm run timeline && npm run music, lalu render dengan --props=\'{"voiceover":true}\'');
