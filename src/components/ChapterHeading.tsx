@@ -6,6 +6,13 @@ import {TIMELINE} from '../timeline.ts';
 
 const TOTAL_CHAPTERS = TIMELINE.scenes.filter((s) => s.chapter).length;
 
+// Tiga bagian wajib tugas: teori dasar, implementasi dalam kimia, penerapan industri.
+const PARTS: Record<number, {label: string; color: string}> = {
+  1: {label: 'BAGIAN 1 · PRINSIP & TEORI DASAR', color: C.cyan},
+  2: {label: 'BAGIAN 2 · IMPLEMENTASI DALAM KIMIA', color: C.violet},
+  3: {label: 'BAGIAN 3 · PENERAPAN DI INDUSTRI', color: C.amber},
+};
+
 export const ChapterHeading: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -44,6 +51,38 @@ export const ChapterHeading: React.FC = () => {
           })}
         </div>
       </div>
+      {scene.part ? (
+        (() => {
+          const part = PARTS[scene.part];
+          const prev = TIMELINE.scenes[scene.index - 1];
+          // bab pertama dari sebuah bagian: label lebih terang selama beberapa detik
+          const fresh = prev?.part !== scene.part ? 1 - ramp(lt, 4, 6) : 0;
+          const p = ramp(lt, 0.5, 1.2);
+          return (
+            <div
+              style={{
+                position: 'absolute',
+                left: 96,
+                top: 122,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                fontFamily: FONT.mono,
+                fontSize: 19,
+                fontWeight: 600,
+                letterSpacing: 2.5,
+                color: part.color,
+                opacity: p * (0.85 + 0.15 * fresh),
+                translate: `${(1 - p) * -16}px 0px`,
+                textShadow: fresh > 0 ? `0 0 ${14 * fresh}px ${part.color}` : undefined,
+              }}
+            >
+              <span style={{width: 8, height: 8, borderRadius: 4, background: part.color, boxShadow: `0 0 10px ${part.color}`}} />
+              {part.label}
+            </div>
+          );
+        })()
+      ) : null}
       {/* indikator progres bab */}
       <div style={{position: 'absolute', right: 96, top: 84, display: 'flex', gap: 6, opacity: 0.8 * ramp(lt, 0.4, 1)}}>
         {Array.from({length: TOTAL_CHAPTERS}, (_, i) => (
