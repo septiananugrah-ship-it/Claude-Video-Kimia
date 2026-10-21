@@ -7,20 +7,11 @@ import {Captions} from './components/Captions';
 import {ChapterHeading} from './components/ChapterHeading';
 import {POST, PRE, SceneProvider, useScene} from './SceneContext';
 import {SCENES} from './scenes';
+import {type VideoProps, defaultVideoProps} from './defaults.ts';
 import {FPS, TIMELINE, lineKey, type TScene} from './timeline.ts';
 
-export type VideoProps = {
-  showCaptions: boolean;
-  musicVolume: number;
-  /** true = putar public/voiceover/<scene>-<baris>.mp3 (hasil scripts/generate-voiceover.ts) */
-  voiceover: boolean;
-};
+export {defaultVideoProps, type VideoProps};
 
-export const defaultVideoProps: VideoProps = {
-  showCaptions: true,
-  musicVolume: 0.9,
-  voiceover: false,
-};
 
 /** Bingkai kamera: dorongan pelan + transisi masuk/keluar sinematik. */
 const SceneShell: React.FC<{children: React.ReactNode}> = ({children}) => {
@@ -95,6 +86,15 @@ export const SidikJariMolekul: React.FC<VideoProps> = ({showCaptions, musicVolum
     </AbsoluteFill>
   );
 };
+
+/** Versi 2K (2560×1440): seluruh film 1920×1080 diperbesar sebagai vektor, jadi tetap tajam. */
+export const SidikJariMolekul2K: React.FC<VideoProps> = (props) => (
+  <AbsoluteFill style={{backgroundColor: '#04060c'}}>
+    <div style={{position: 'absolute', left: 0, top: 0, width: 1920, height: 1080, transform: `scale(${2560 / 1920})`, transformOrigin: '0 0'}}>
+      <SidikJariMolekul {...props} />
+    </div>
+  </AbsoluteFill>
+);
 
 /** Pratinjau satu scene saja (folder "Adegan" di Studio). */
 export const SingleScene: React.FC<{sceneId: string}> = ({sceneId}) => {
