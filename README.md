@@ -79,6 +79,10 @@ Versi 2K adalah komposisi `SidikJariMolekul2K`: seluruh desain 1920×1080 diperb
 
 Di lingkungan Linux tanpa Chrome lengkap, arahkan Remotion ke *headless shell*: `CHROME_PATH=/path/ke/headless_shell npm run render`.
 
+## Poles visual (Oktober 2026)
+
+Tanpa mengubah naskah (voice-over tetap sinkron): bola dan titik yang bergerak kini berupa partikel bercahaya berjejak (`Spark`) — di grafik Hooke, lanskap energi, tanjakan klasik vs tangga kuantum, sumur fungsi gelombang, dan lompatan v = 0 → 1; foton yang diserap HCl memicu riak cahaya (`Ripple`) dan debu cahaya (`Motes`); CO₂ di atmosfer beriak merah saat menyerap panas; atom H meninggalkan bayangan gerak saat berosilasi; simpul rangkuman menyala dengan riak; sidik jari pembuka dikelilingi debu emas; atom diberi cahaya tepi dan kartu rumus diberi garis aksen + kilau. Gerak global: partikel cahaya melayang naik di seluruh film (`Drift`), kamera berayun halus, pendar atom bernapas, dan kartu rumus melayang pelan. Dua tabrakan tata letak diperbaiki (kartu hukum Hooke vs sumbu grafik, kartu efek rumah kaca vs heading bab).
+
 ## Struktur kode
 
 ```

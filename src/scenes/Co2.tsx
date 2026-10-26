@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, ramp, win} from '../anim';
-import {Arrow, Atom, Badge, Bond, Card, Glow, Label, Stage} from '../components/primitives';
+import {Arrow, Atom, Badge, Bond, Card, Glow, Label, Ripple, Stage} from '../components/primitives';
 import {PhotonPacket} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C, FONT} from '../theme';
@@ -134,6 +134,10 @@ export const Co2: React.FC = () => {
               <PhotonPacket key={k} x={h.x} y={y} wavelength={46} color={C.red} amp={16} len={160} angle={-90} opacity={vis * (h.ph < 0.05 ? h.ph * 20 : 1)} phase={-t * 10} />
             );
           })}
+          {/* riak panas saat CO₂ menyerap foton IR */}
+          {heat.map((h, k) =>
+            k % 2 === 0 ? <Ripple key={`rp${k}`} x={h.x} y={640} p={(h.ph - 0.45) / 0.45} r={150} color={C.red} rings={2} /> : null,
+          )}
           {heat.map((h, k) => {
             const isCO2 = k % 2 === 0;
             const hit = isCO2 && h.ph > 0.45 ? Math.max(0, 1 - (h.ph - 0.45) * 2.5) : 0;
@@ -186,7 +190,7 @@ export const Co2: React.FC = () => {
           />
         );
       })}
-      <Card x={960} y={175} opacity={earth * ramp(t, cue(9) + 1.5, cue(9) + 2.2)} accent={C.red} style={{fontSize: 28}}>
+      <Card x={1090} y={175} opacity={earth * ramp(t, cue(9) + 1.5, cue(9) + 2.2)} accent={C.red} style={{fontSize: 28}}>
         CO₂ menyerap <span style={{color: C.red, fontWeight: 600}}>radiasi panas (IR)</span> dari Bumi · N₂ &amp; O₂ meloloskannya
       </Card>
     </AbsoluteFill>

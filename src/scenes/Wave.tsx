@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, rand, ramp, win} from '../anim';
-import {Arrow, Atom, Card, DrawPath, Glow, Label, Stage, V} from '../components/primitives';
+import {Arrow, Atom, Card, DrawPath, Glow, Label, Spark, Stage, V} from '../components/primitives';
 import {parabolaPath, psiPath, samplePsi2, type Well, wellX, wellY} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C} from '../theme';
@@ -50,7 +50,7 @@ export const Wave: React.FC = () => {
             </g>
           </g>
           <Glow x={wellX(W, ballXi)} y={wellY(W, e1) - 20} r={50} color="gold" opacity={0.5} />
-          <circle cx={wellX(W, ballXi)} cy={wellY(W, e1) - 20} r={18} fill={C.gold} />
+          <Spark x={wellX(W, ballXi)} y={wellY(W, e1) - 20} r={17} color={C.gold} trail={Array.from({length: 7}, (_, k) => [wellX(W, xiTurn * Math.sin(2 * Math.PI * 0.5 * (t - (k + 1) * 0.035))), wellY(W, e1) - 20] as [number, number])} />
           <Label x={wellX(W, 0)} y={wellY(W, e1) - 120} size={60} weight={700} opacity={1 - traj}>
             ?
           </Label>

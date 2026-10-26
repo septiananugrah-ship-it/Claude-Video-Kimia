@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, ramp, sample, smoothPath, win} from '../anim';
-import {Atom, Bond, Card, DrawPath, Glow, Stage} from '../components/primitives';
+import {Atom, Bond, Card, DrawPath, Glow, Motes, Ripple, Stage} from '../components/primitives';
 import {Fingerprint, Sheet} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C, FONT} from '../theme';
@@ -79,6 +79,7 @@ export const Hook: React.FC = () => {
           <DrawPath d={wave} p={waveP} stroke={C.cyan} width={5} glow len={3000} />
         </g>
         {/* Molekul kecil */}
+        <Motes x={960} y={540} rx={380} ry={230} t={t} n={40} color={C.cyan} opacity={mol * 0.7 * (1 - waveOut)} seed={3} />
         <g opacity={mol * 0.95}>
           {bonds.map(([a, b], i) => (
             <Bond key={i} x1={pos[a][0]} y1={pos[a][1]} x2={pos[b][0]} y2={pos[b][1]} width={10} />
@@ -88,6 +89,8 @@ export const Hook: React.FC = () => {
           ))}
         </g>
         {/* Sidik jari */}
+        <Ripple x={960} y={480} p={ramp(t, cue(7) + 2.6, cue(7) + 4.6)} r={480} color={C.gold} rings={3} width={3} />
+        <Motes x={960} y={480} rx={430} ry={330} t={t} n={60} color={C.gold} opacity={fpP} seed={1} />
         <Fingerprint x={960} y={480} scale={1.15} p={fpP} opacity={ramp(t, cue(7) - 0.2, cue(7) + 0.4)} />
         <Glow x={960} y={480} r={420} color="gold" opacity={0.18 * fpP} />
       </Stage>

@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, ramp, win} from '../anim';
-import {Card, Glow, Label, Stage, V} from '../components/primitives';
+import {Card, Glow, Label, Spark, Stage, V} from '../components/primitives';
 import {parabolaPath, type Well, wellX, wellY} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C, FONT} from '../theme';
@@ -86,7 +86,7 @@ export const Ladder: React.FC = () => {
             <path d={`M${ramp0.x},${ramp0.y} L${ramp1.x},${ramp1.y} L${ramp1.x},${ramp0.y} Z`} fill={C.cyan} opacity={0.08} />
             <line x1={ramp0.x} y1={ramp0.y} x2={ramp1.x} y2={ramp1.y} stroke={C.cyan} strokeWidth={5} filter="url(#glow)" />
             <Glow x={bx} y={by} r={60} color="gold" opacity={0.6} />
-            <circle cx={bx} cy={by} r={24} fill={C.gold} />
+            <Spark x={bx} y={by} r={20} color={C.gold} />
             <rect x={870} y={340} width={20} height={420} rx={10} fill="#1a2140" />
             <rect x={870} y={760 - 420 * cp} width={20} height={420 * cp} rx={10} fill={C.cyan} />
             <Label x={880} y={790} size={22} color={C.muted} font="serif" italic>
@@ -103,7 +103,7 @@ export const Ladder: React.FC = () => {
               </g>
             ))}
             <Glow x={qx} y={qy} r={60} color="gold" opacity={0.6} />
-            <circle cx={qx} cy={qy} r={24} fill={C.gold} />
+            <Spark x={qx} y={qy} r={20} color={C.gold} />
             <rect x={1830} y={340} width={20} height={420} rx={10} fill="#1a2140" />
             {Array.from({length: N}, (_, i) => (
               <rect key={i} x={1830} y={760 - (i + 1) * 84 + 4} width={20} height={76} rx={6} fill={i <= qLevel ? C.violet : 'transparent'} />

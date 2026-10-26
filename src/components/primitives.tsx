@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill} from 'remotion';
+import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {smoothPath} from '../anim';
 import {ATOM, C, FONT, H, W} from '../theme';
 
@@ -110,11 +110,22 @@ export const Atom: React.FC<{
 }> = ({x, y, el, r, label, opacity = 1, glow = 1, charge}) => {
   const a = ATOM[el] ?? ATOM.C;
   const R = r ?? a.r;
+  const f = useCurrentFrame();
+  const pulse = 0.8 + 0.2 * Math.sin((f / 30) * 2.2 + x * 0.011 + y * 0.017); // pendar atom "bernapas"
   const text = label === undefined ? el : label;
   return (
     <g opacity={opacity}>
-      {glow > 0 ? <circle cx={x} cy={y} r={R * 2.3} fill={`url(#glow-${el in ATOM ? el : 'C'})`} opacity={glow} /> : null}
+      {glow > 0 ? <circle cx={x} cy={y} r={R * 2.3 * (0.96 + 0.04 * pulse)} fill={`url(#glow-${el in ATOM ? el : 'C'})`} opacity={glow * pulse} /> : null}
       <circle cx={x} cy={y} r={R} fill={`url(#atom-${el in ATOM ? el : 'C'})`} />
+      {/* cahaya tepi (rim light) dari bawah-kanan: memberi kesan bola 3D yang disinari panggung */}
+      <path
+        d={`M${x + R * 0.95},${y + R * 0.3} A${R},${R} 0 0 1 ${x - R * 0.3},${y + R * 0.95}`}
+        fill="none"
+        stroke={a.glow}
+        strokeWidth={Math.max(1.5, R * 0.07)}
+        strokeLinecap="round"
+        opacity={0.55}
+      />
       <ellipse cx={x - R * 0.32} cy={y - R * 0.38} rx={R * 0.3} ry={R * 0.18} fill="#fff" opacity={0.45} transform={`rotate(-30 ${x - R * 0.32} ${y - R * 0.38})`} />
       {text ? (
         <text
@@ -294,13 +305,15 @@ export const Card: React.FC<{
   plain?: boolean;
 }> = ({x, y, children, opacity = 1, scale = 1, anchor = 'center', accent = C.gold, style, plain}) => {
   const tx = anchor === 'center' ? '-50%' : anchor === 'right' ? '-100%' : '0%';
+  const fr = useCurrentFrame();
+  const fy = 3 * Math.sin((fr / 30) * 0.9 + x * 0.003); // kartu melayang pelan
   return (
     <div
       style={{
         position: 'absolute',
         left: x,
         top: y,
-        transform: `translate(${tx}, -50%) scale(${scale})`,
+        transform: `translate(${tx}, calc(-50% + ${fy.toFixed(2)}px)) scale(${scale})`,
         transformOrigin: anchor === 'center' ? '50% 50%' : anchor === 'left' ? '0% 50%' : '100% 50%',
         opacity,
         padding: plain ? 0 : '18px 30px',
@@ -314,6 +327,20 @@ export const Card: React.FC<{
         ...style,
       }}
     >
+      {plain ? null : (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 18,
+            pointerEvents: 'none',
+            background: `linear-gradient(105deg, transparent ${-30 + opacity * 130}%, rgba(255,240,200,0.10) ${-15 + opacity * 130}%, transparent ${0 + opacity * 130}%)`,
+          }}
+        />
+      )}
+      {plain ? null : (
+        <div style={{position: 'absolute', left: 24, right: 24, top: -1, height: 1, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, opacity: 0.9}} />
+      )}
       {children}
     </div>
   );
@@ -397,5 +424,81 @@ export const DrawPath: React.FC<{
       strokeDashoffset={dash ? undefined : len * (1 - p)}
       pathLength={dash ? undefined : len}
     />
+  );
+};
+
+/** Partikel bercahaya: inti putih, halo berlapis, jejak opsional (titik-titik yang memudar). */
+export const Spark: React.FC<{
+  x: number;
+  y: number;
+  r?: number;
+  color?: string;
+  opacity?: number;
+  trail?: [number, number][];
+  halo?: number;
+}> = ({x, y, r = 10, color = C.cyan, opacity = 1, trail, halo = 1}) => {
+  if (opacity <= 0.001) return null;
+  return (
+    <g opacity={opacity}>
+      {trail?.map(([tx, ty], i) => (
+        <circle key={i} cx={tx} cy={ty} r={r * (1 - i / (trail.length + 1)) * 0.75} fill={color} opacity={0.4 * (1 - i / trail.length)} />
+      ))}
+      <circle cx={x} cy={y} r={r * 3.4} fill={color} opacity={0.07 * halo} />
+      <circle cx={x} cy={y} r={r * 2} fill={color} opacity={0.18 * halo} />
+      <circle cx={x} cy={y} r={r} fill={color} />
+      <circle cx={x} cy={y} r={r * 0.5} fill="#fff" opacity={0.85} />
+    </g>
+  );
+};
+
+/** Riak cahaya: cincin yang mengembang & memudar (p: 0..1), untuk foton diserap / dipancarkan. */
+export const Ripple: React.FC<{x: number; y: number; p: number; r?: number; color?: string; rings?: number; width?: number}> = ({
+  x,
+  y,
+  p,
+  r = 160,
+  color = C.gold,
+  rings = 3,
+  width = 3,
+}) => {
+  if (p <= 0 || p >= 1) return null;
+  return (
+    <g>
+      {Array.from({length: rings}, (_, i) => {
+        const q = p * 1.35 - i * 0.17;
+        if (q <= 0 || q >= 1) return null;
+        return <circle key={i} cx={x} cy={y} r={r * q} fill="none" stroke={color} strokeWidth={width * (1 - q) + 0.5} opacity={(1 - q) * 0.85} />;
+      })}
+      <circle cx={x} cy={y} r={r * 0.35} fill={`url(#soft-white)`} opacity={0.5 * Math.sin(Math.PI * p)} />
+    </g>
+  );
+};
+
+/** Debu bintang di sekitar objek (titik halus berkelip, deterministik). */
+export const Motes: React.FC<{x: number; y: number; rx: number; ry: number; t: number; n?: number; color?: string; opacity?: number; seed?: number}> = ({
+  x,
+  y,
+  rx,
+  ry,
+  t,
+  n = 40,
+  color = C.gold,
+  opacity = 1,
+  seed = 0,
+}) => {
+  if (opacity <= 0.001) return null;
+  const rnd = (k: number) => {
+    const s = Math.sin(k * 12.9898 + seed * 78.233) * 43758.5453;
+    return s - Math.floor(s);
+  };
+  return (
+    <g opacity={opacity}>
+      {Array.from({length: n}, (_, i) => {
+        const a = rnd(i) * Math.PI * 2 + t * (0.05 + rnd(i + 3) * 0.12) * (rnd(i + 9) > 0.5 ? 1 : -1);
+        const d = 0.35 + 0.65 * Math.sqrt(rnd(i + 5));
+        const tw = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * (1.2 + rnd(i + 7) * 2) + i));
+        return <circle key={i} cx={x + Math.cos(a) * rx * d} cy={y + Math.sin(a) * ry * d - ((t * 6 * rnd(i + 2)) % 30)} r={0.8 + rnd(i + 1) * 2.2} fill={color} opacity={tw * 0.7} />;
+      })}
+    </g>
   );
 };

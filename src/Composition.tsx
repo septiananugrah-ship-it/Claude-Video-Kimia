@@ -4,6 +4,7 @@ import {AbsoluteFill, Sequence, staticFile, useCurrentFrame, useVideoConfig} fro
 import {EASE, EASE_IN_OUT, ramp} from './anim';
 import {Background, Vignette} from './components/Background';
 import {Captions} from './components/Captions';
+import {Drift} from './components/Drift';
 import {ChapterHeading} from './components/ChapterHeading';
 import {POST, PRE, SceneProvider, useScene} from './SceneContext';
 import {SCENES} from './scenes';
@@ -23,11 +24,15 @@ const SceneShell: React.FC<{children: React.ReactNode}> = ({children}) => {
   const push = 1 + 0.03 * (t / Math.max(dur, 1));
   const scale = push * (0.94 + 0.06 * enter) * (1 + 0.07 * exit);
   const blur = 14 * (1 - enter) + 18 * exit;
+  // ayunan kamera halus (seperti kamera melayang) agar setiap adegan tidak terasa diam
+  const swayX = 4 * Math.sin(t * 0.31 + 1.3);
+  const swayY = 3 * Math.sin(t * 0.23);
   return (
     <AbsoluteFill
       style={{
         opacity: enter * (1 - exit),
         scale: String(scale),
+        translate: `${swayX.toFixed(2)}px ${swayY.toFixed(2)}px`,
         filter: blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : undefined,
       }}
     >
@@ -100,6 +105,7 @@ export const SidikJariMolekul: React.FC<VideoProps> = ({showCaptions, musicVolum
   return (
     <AbsoluteFill style={{backgroundColor: '#04060c'}}>
       <Background />
+      <Drift />
       {TIMELINE.scenes.map((s) => (
         <SceneSlot key={s.id} scene={s} />
       ))}
@@ -137,6 +143,7 @@ export const SingleScene: React.FC<{sceneId: string}> = ({sceneId}) => {
     <AbsoluteFill style={{backgroundColor: '#04060c'}}>
       <Sequence from={-Math.round(scene.start * FPS)} layout="absolute-fill">
         <Background />
+      <Drift />
         <SceneSlot scene={scene} />
         <ChapterHeading />
         <Captions />
