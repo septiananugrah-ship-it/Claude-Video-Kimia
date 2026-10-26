@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Easing} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, ramp, sample, smoothPath, win} from '../anim';
-import {Arrow, Atom, Badge, Bond, Card, Glow, Label, Spring, Stage, V} from '../components/primitives';
+import {Arrow, Atom, Badge, Bond, Card, Glow, Label, Motes, Ripple, Spark, Spring, Stage, V} from '../components/primitives';
 import {PhotonPacket} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C} from '../theme';
@@ -100,6 +100,8 @@ export const Light: React.FC = () => {
             <Atom x={molX} y={molY} el="Cl" r={58} />
             <Atom x={molX + 210 + s} y={molY} el="H" r={32} />
           </g>
+          <Ripple x={molX + 105} y={molY} p={ramp(t, tArrive - 0.15, tArrive + 1.6)} r={300} color={C.gold} rings={3} width={4} />
+          <Motes x={molX + 105} y={molY} rx={300} ry={170} t={t} n={50} color={C.gold} opacity={absorbed * P1} seed={5} />
           <PhotonPacket x={mix(-100, molX + 150, gp)} y={molY} wavelength={64} color={C.gold} opacity={gOpacity} phase={-t * 12} />
           <PhotonPacket x={mix(-200, 2150, cp)} y={molY + 6} wavelength={30} color={C.cyan} opacity={cOpacity} phase={-t * 18} amp={22} />
 
@@ -113,7 +115,14 @@ export const Light: React.FC = () => {
                 </Label>
               </g>
             ))}
-            <circle cx={dX + 70} cy={dotY - 14} r={12} fill={C.gold} filter="url(#glow)" />
+            <Spark
+              x={dX + 70}
+              y={dotY - 14}
+              r={11}
+              color={C.gold}
+              trail={[1, 2, 3, 4, 5].map((k) => [dX + 70, mix(lv[0], lv[1], ramp(t - k * 0.04, tArrive, tArrive + 0.6, EASE_IN_OUT)) - 14] as [number, number])}
+            />
+            <Ripple x={dX + 70} y={lv[1] - 14} p={ramp(t, tArrive + 0.45, tArrive + 1.6)} r={90} color={C.cyan} rings={2} />
             <g opacity={ramp(t, tArrive - 0.2, tArrive + 0.3)}>
               <Arrow x1={dX + 130} y1={lv[0] - 6} x2={dX + 130} y2={lv[1] + 8} color="mint" width={5} />
               <Label x={dX + 170} y={(lv[0] + lv[1]) / 2} size={34} color={C.mint} weight={700}>

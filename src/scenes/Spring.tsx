@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, rand, ramp, win} from '../anim';
-import {Arrow, Atom, Card, Glow, Label, Spring as SpringShape, Stage, V} from '../components/primitives';
+import {Arrow, Atom, Card, Glow, Label, Motes, Spark, Spring as SpringShape, Stage, V} from '../components/primitives';
 import {useScene} from '../SceneContext';
 import {C} from '../theme';
 
@@ -41,6 +41,10 @@ export const Spring: React.FC = () => {
 
   const eqLine = win(t, cue(1), cue(4) + 1.5, 0.6, 0.8);
   const force = ramp(t, cue(2) + 0.4, cue(2) + 1) * (1 - ramp(t, cue(7) - 0.4, cue(7)));
+
+  // posisi lampau (untuk jejak gerak) — hanya saat berosilasi bebas
+  const xAt = (dt: number) => (released ? mix(-70, A * -Math.cos(2 * Math.PI * 0.55 * (t - dt - t0)), ramp(t - dt, t0, t0 + 0.6)) : x);
+  const ghosts = released ? [1, 2, 3, 4].map((k) => xAt(k * 0.05)) : [];
 
   // Grafik F terhadap x
   const g = {cx: 1450, cy: 500, s: 2.2};
@@ -83,6 +87,10 @@ export const Spring: React.FC = () => {
 
           <SpringShape x1={clX + 40} y1={y} x2={hX - 26} y2={y} coils={10} amp={22} width={7} opacity={springOpacity} />
           <Atom x={clX} y={y} el="Cl" r={66} />
+          {ghosts.map((gx, k) => (
+            <circle key={k} cx={hX0 + gx} cy={y} r={36 - k * 3} fill="#cfdcff" opacity={0.16 - k * 0.035} />
+          ))}
+          <Motes x={(clX + hX0) / 2} y={y} rx={420} ry={190} t={t} n={46} color={C.gold} opacity={0.55 * intro * (1 - cloud)} seed={2} />
           <Atom x={hX} y={y} el="H" r={38} />
 
           {/* gaya pemulih */}
@@ -128,11 +136,17 @@ export const Spring: React.FC = () => {
             filter="url(#glow)"
           />
           <line x1={dot.x} y1={g.cy} x2={dot.x} y2={dot.y} stroke={C.red} strokeWidth={3} strokeDasharray="5 6" />
-          <circle cx={dot.x} cy={dot.y} r={13} fill={C.gold} filter="url(#glow)" />
+          <Spark
+            x={dot.x}
+            y={dot.y}
+            r={12}
+            color={C.gold}
+            trail={[1, 2, 3, 4, 5, 6].map((k) => [g.cx + xAt(k * 0.04) * g.s, g.cy + xAt(k * 0.04) * g.s * 0.85] as [number, number])}
+          />
         </g>
       </Stage>
 
-      <Card x={g.cx} y={210} opacity={win(t, cue(6) - 0.2, cue(7) - 0.2, 0.5, 0.6) * graphOn} scale={0.9 + 0.1 * ramp(t, cue(6), cue(6) + 0.5, BACK)}>
+      <Card x={g.cx} y={182} opacity={win(t, cue(6) - 0.2, cue(7) - 0.2, 0.5, 0.6) * graphOn} scale={0.9 + 0.1 * ramp(t, cue(6), cue(6) + 0.5, BACK)}>
         <div style={{fontSize: 64, letterSpacing: 1}}>
           <V color={C.red}>F</V> = −<V color={C.gold}>k</V> <V color={C.cyan}>x</V>
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, ramp, sample, smoothPath, win} from '../anim';
-import {Arrow, Atom, Badge, Card, DrawPath, Glow, Label, Spring, Stage, V} from '../components/primitives';
+import {Arrow, Atom, Badge, Card, DrawPath, Glow, Label, Spark, Spring, Stage, V} from '../components/primitives';
 import {useScene} from '../SceneContext';
 import {C} from '../theme';
 
@@ -83,8 +83,7 @@ export const Landscape: React.FC = () => {
           {/* bola */}
           <g opacity={ball}>
             <Glow x={px(r)} y={py(v) - 20} r={60} color="gold" opacity={0.6} />
-            <circle cx={px(r)} cy={py(v) - 20} r={20} fill={C.gold} />
-            <ellipse cx={px(r) - 6} cy={py(v) - 27} rx={7} ry={4} fill="#fff" opacity={0.6} />
+            <Spark x={px(r)} y={py(v) - 20} r={19} color={C.gold} />
           </g>
           <g opacity={zoom}>
             <Glow x={fx} y={fy - 40} r={200} color="gold" opacity={0.35} />

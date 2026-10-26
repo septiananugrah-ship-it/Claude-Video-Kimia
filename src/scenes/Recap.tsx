@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {BACK, EASE_IN_OUT, mix, rand, ramp, sample, smoothPath} from '../anim';
-import {DrawPath, Glow, Label, Spring, Stage} from '../components/primitives';
+import {DrawPath, Glow, Label, Motes, Ripple, Spring, Stage} from '../components/primitives';
 import {Fingerprint, PhotonPacket} from '../components/viz';
 import {useScene} from '../SceneContext';
 import {C, FONT} from '../theme';
@@ -91,6 +91,8 @@ export const Recap: React.FC = () => {
             return (
               <g key={i}>
                 <Glow x={n.x} y={n.y} r={180} color="white" opacity={0.08 + 0.12 * on} />
+                <Ripple x={n.x} y={n.y} p={ramp(t, cue(i + 1) - 0.1, cue(i + 1) + 1.5)} r={230} color={n.color} rings={2} />
+                <Motes x={n.x} y={n.y} rx={150} ry={150} t={t} n={14} color={n.color} opacity={0.8 * on} seed={i} />
                 <circle cx={n.x} cy={n.y} r={96} fill="rgba(12,18,40,0.92)" stroke={on > 0.05 ? n.color : C.faint} strokeWidth={3 + 2 * on} />
                 <circle cx={n.x} cy={n.y} r={96 + 14 * on} fill="none" stroke={n.color} strokeWidth={2} opacity={0.4 * on} />
                 <g opacity={0.35 + 0.65 * on}>
